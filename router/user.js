@@ -74,9 +74,9 @@ router.put("/set-otp", async (req, res) => {
     let otp = String(Math.floor(Math.random() * (9999 - 1000)));
     let date = getCurrentDate();
     await User.findOneAndUpdate(
-        {email: req.body.email,},
-        {$set: { otp: { otp, date } }}
-        );
+      { email: req.body.email },
+      { $set: { otp: { otp, date } } }
+    );
     //Creating mail details
     let mailData = {
       email: user.email,
@@ -85,7 +85,7 @@ router.put("/set-otp", async (req, res) => {
     };
     //Sending mail
     let mail = await MailSender({ data: mailData });
-    console.log(mail)
+    console.log(mail);
     let msg = mail ? "Mail sent" : "Error sending mail";
 
     res.send({ message: msg });
@@ -111,8 +111,8 @@ router.put("/reset-password", async (req, res) => {
       let salt = await bcrypt.genSalt(15);
       let hashedPassword = await bcrypt.hash(req.body.password, salt);
       await User.findOneAndUpdate(
-        {email: req.body.email},
-        {$set: { password: hashedPassword }},
+        { email: req.body.email },
+        { $set: { password: hashedPassword } }
       );
       res.send({ message: "Password Updated Successfully" });
     } else if (otp === user.otp.otp) {
