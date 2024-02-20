@@ -21,4 +21,15 @@ function getCurrentDate() {
   return date;
 }
 
-export { generateJwtToken, getCurrentDate };
+//Decode Jwt Token
+const decodeJwtToken = (token) => {
+  try {
+    let decoded = jwt.verify(token, process.env.SECRET_KEY);
+    return decoded.id;
+  } catch (error) {
+    console.error("Error in Jwt Decoding", error);
+    return null;
+  }
+};
+
+export { generateJwtToken, getCurrentDate,decodeJwtToken };

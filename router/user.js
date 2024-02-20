@@ -2,7 +2,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 import { User } from "../Model/user.js";
 import { MailSender } from "../mailer.js";
-import { generateJwtToken, getCurrentDate } from "../service.js";
+import { decodeJwtToken, generateJwtToken, getCurrentDate } from "../service.js";
 
 let router = express.Router();
 
@@ -85,10 +85,9 @@ router.put("/set-otp", async (req, res) => {
     };
     //Sending mail
     let mail = await MailSender({ data: mailData });
-    console.log(mail);
     let msg = mail ? "Mail sent" : "Error sending mail";
 
-    res.send({ message: msg });
+    res.send({ message: msg,otp });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
@@ -120,6 +119,24 @@ router.put("/reset-password", async (req, res) => {
     } else {
       res.send({ message: "Invalid OTP" });
     }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+//Get User Data
+router.get("/get-user", async (req, res) => {
+  try {
+    let token=req.headers["x-auth"];
+    let userId=decodeJwtToken(token)
+    let user = await User.findById({_id:userId  });
+    
+    if (!user) {
+      return res.status(400).json({ message: "Invalid Credentials" });
+    }
+    console.log(user,token,userId);
+    res.status(200).json({ message:"user data got successfully",user});
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
